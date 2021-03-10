@@ -1,0 +1,18 @@
+.todos{
+    margin-top: 20px;
+
+    .todo{
+        background-color: rgb(215, 231, 236);
+        margin-bottom: 20px;
+        padding: 10px;
+        border-radius: 5px;
+
+        span{
+            margin-left: 5px;
+        }
+
+        .completed{
+            text-decoration: line-through;
+        }
+    }
+}

@@ -1,9 +1,10 @@
 import React from 'react';
+import Page from '../../components/Page';
 
-export default function Home() {
+export default function Todo() {
   return (
-    <div>
+    <Page title="Home">
       Página Home
-    </div>
+    </Page>
   );
 }
