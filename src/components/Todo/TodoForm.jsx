@@ -10,6 +10,7 @@ export default function TodoForm({ todos, setTodos }) {
 
   const handleSubmit = (event) => { // todos os forms retornam esse event
     event.preventDefault(); // não deixa a página recarergar
+
     setTodos([...todos, { name: todo, completed: false, id: unique() }]);
     // faz spread dos todos existentes e insere o novo
     setTodo(''); // limpa o campo do formulario. OBS: setTodo != setTodos
@@ -32,7 +33,7 @@ export default function TodoForm({ todos, setTodos }) {
           </Form.Group>
         </Col>
         <Col>
-          <Button type="submit">Add Todo</Button>
+          <Button disabled={!todo.trim()} type="submit">Add Todo</Button>
         </Col>
       </Row>
     </Form>

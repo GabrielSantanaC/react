@@ -1,8 +1,14 @@
-import React from 'react';
-import { Table, Button } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Table, Button, Form } from 'react-bootstrap';
+import { FaTrash, FaPencilAlt } from 'react-icons/fa';
+import Modal from '../Modal';
 import './Todo.scss';
 
 export default function TodoList({ setTodos, todos = [] }) {
+  const [editTodo, setEditTodo] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [text, setText] = useState('');
+
   const handleRemove = ({ id }) => {
     const newTodos = todos.filter((todo) => todo.id !== id);
     setTodos(newTodos);
@@ -25,8 +31,29 @@ export default function TodoList({ setTodos, todos = [] }) {
     setTodos(newTodos);
   };
 
+  const handleEdit = (todo) => {
+    setEditTodo(todo);
+    setText(todo?.name); // Opitional Chaining ?
+    setShowModal(!showModal);
+  };
+
+  const onEditTodo = () => {
+    const newTodos = todos.map((todo) => {
+      if (todo.id === editTodo.id) {
+        return {
+          ...todo,
+          name: text,
+        };
+      }
+      return todo;
+    });
+
+    setTodos(newTodos);
+    handleEdit();
+  };
+
   return (
-    <div>
+    <>
       <Table bordered hover className="todos">
         <thead>
           <tr>
@@ -48,13 +75,33 @@ export default function TodoList({ setTodos, todos = [] }) {
                 </span>
               </td>
               <td>
-                <Button className="mr-2">Edit</Button>
-                <Button variant="danger" onClick={() => handleRemove(todo)}>Remove</Button>
+                <Button onClick={() => handleEdit(todo)} className="mr-2">
+                  <FaPencilAlt />
+                  {' Edit'}
+                </Button>
+                <Button variant="danger" onClick={() => handleRemove(todo)}>
+                  <FaTrash />
+                  {' Remove'}
+                </Button>
               </td>
             </tr>
           ))}
         </tbody>
       </Table>
-    </div>
+      <Modal
+        onSubmit={onEditTodo}
+        show={showModal}
+        toggle={() => handleEdit()}
+        title={editTodo?.name}
+      >
+        <Form.Group>
+          <Form.Label>Todo name</Form.Label>
+          <Form.Control
+            value={text}
+            onChange={({ target: { value } }) => setText(value)}
+          />
+        </Form.Group>
+      </Modal>
+    </>
   );
 }
