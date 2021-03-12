@@ -3,17 +3,21 @@ import {
   Row, Col, Form, Button,
 } from 'react-bootstrap';
 
+import axios from '../../utils/api';
+
 export default function TodoForm({ todos, setTodos }) {
   const [todo, setTodo] = useState('');
 
-  const unique = () => new Date().getTime();
-
-  const handleSubmit = (event) => { // todos os forms retornam esse event
+  const handleSubmit = async (event) => { // todos os forms retornam um event
     event.preventDefault(); // não deixa a página recarergar
 
-    setTodos([...todos, { name: todo, completed: false, id: unique() }]);
-    // faz spread dos todos existentes e insere o novo
-    setTodo(''); // limpa o campo do formulario. OBS: setTodo != setTodos
+    try {
+      const response = await axios.post('/todos', { name: todo, completed: false });
+      setTodos([...todos, response.data]);// faz spread dos todos existentes e insere o novo
+      setTodo(''); // limpa o campo do formulario. OBS: setTodo !== setTodos
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   const onChange = (event) => {

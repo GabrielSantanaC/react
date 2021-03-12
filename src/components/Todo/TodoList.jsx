@@ -4,31 +4,42 @@ import { FaTrash, FaPencilAlt } from 'react-icons/fa';
 import Modal from '../Modal';
 import './Todo.scss';
 
+import axios from '../../utils/api';
+
 export default function TodoList({ setTodos, todos = [] }) {
   const [editTodo, setEditTodo] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [text, setText] = useState('');
 
-  const handleRemove = ({ id }) => {
+  const handleRemove = async ({ id }) => {
     const newTodos = todos.filter((todo) => todo.id !== id);
-    setTodos(newTodos);
+    try {
+      await axios.delete(`/todos/${id}`);
+      setTodos(newTodos);
+    } catch (e) {
+      console.error(e.message);
+    }
   };
 
-  const handleChecked = (event, { id }) => {
-    const { checked } = event.target;
+  const handleChecked = async (event, _todo) => {
+    const { checked: completed } = event.target;
 
     const newTodos = todos.map((todo) => {
-      if (todo.id === id) {
+      if (todo.id === _todo.id) {
         return {
           ...todo,
-          completed: checked,
+          completed,
         };
       }
 
       return todo;
     });
-
-    setTodos(newTodos);
+    try {
+      await axios.put(`/todos/${_todo.id}`, { ..._todo, completed });
+      setTodos(newTodos);
+    } catch (e) {
+      console.error(e.message);
+    }
   };
 
   const handleEdit = (todo) => {
@@ -37,7 +48,7 @@ export default function TodoList({ setTodos, todos = [] }) {
     setShowModal(!showModal);
   };
 
-  const onEditTodo = () => {
+  const onEditTodo = async () => {
     const newTodos = todos.map((todo) => {
       if (todo.id === editTodo.id) {
         return {
@@ -47,9 +58,13 @@ export default function TodoList({ setTodos, todos = [] }) {
       }
       return todo;
     });
-
-    setTodos(newTodos);
-    handleEdit();
+    try {
+      await axios.put(`/todos/${editTodo.id}`, { ...editTodo, name: text });
+      setTodos(newTodos);
+      handleEdit();
+    } catch (e) {
+      console.error(e.message);
+    }
   };
 
   return (
@@ -67,7 +82,11 @@ export default function TodoList({ setTodos, todos = [] }) {
             // eslint-disable-next-line react/no-array-index-key
             <tr key={index} className="todo">
               <td>
-                <input onChange={(event) => handleChecked(event, todo)} type="checkbox" />
+                <input
+                  checked={todo.completed}
+                  onChange={(event) => handleChecked(event, todo)}
+                  type="checkbox"
+                />
               </td>
               <td>
                 <span className={todo.completed ? 'completed' : ''}>
